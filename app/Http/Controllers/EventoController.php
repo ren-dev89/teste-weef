@@ -149,7 +149,7 @@ class EventoController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return Array
      */
-    public function storeImage(Request $request)
+    private function storeImage(Request $request)
     {
         $image = $request->file('image');
 

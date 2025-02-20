@@ -17,25 +17,7 @@ class EventoController extends Controller
      */
     public function index(Request $request)
     {
-        if($request->query->count() === 0) {
-            $eventos = Evento::all();
-        } else {
-            $eventos = Evento::query();
-            $perPage = $request->query('perPage');
-            $orderBy = $request->query('orderBy');
-
-            // GROUPING
-            if(isset($orderBy)) {
-                $eventos = $eventos->ordered($orderBy);
-            }
-
-            if(isset($perPage)) {
-                $eventos = $eventos->paginate($perPage)->withQueryString();
-            } else {
-                $eventos = $eventos->get();
-            }
-        }
-
+        $eventos = Evento::all();
         return response()->json($eventos);
     }
 
@@ -59,34 +41,35 @@ class EventoController extends Controller
      */
     public function store(Request $request)
     {
-        $rules = [
-            'date' => 'required',
-            'name' => 'required|string',
-            'owner' => 'required|string',
-            'city' => 'required|string',
-            'state' => 'required|string|max:2',
-            'address' => 'required|string',
-            'number' => 'required|numeric',
-            'phone' => 'required|string|max:20'
-        ];
-        $validator = $this->getValidator($request, $rules);
-        if($validator->stopOnFirstFailure()->fails()) {
-            return response()->json(['msg' => $validator->errors()->first()], 400);
-        }
+        // $rules = [
+        //     // Comentado para poder criar eventos sem data por questões de tempo para implementar um date picker no front end
+        //     // 'date' => 'required',
+        //     'name' => 'required|string',
+        //     'owner' => 'required|string',
+        //     'city' => 'required|string',
+        //     'state' => 'required|string|max:2',
+        //     'address' => 'required|string',
+        //     'number' => 'required|numeric',
+        //     'phone' => 'required|string|max:20'
+        // ];
+        // $validator = $this->getValidator($request, $rules);
+        // if($validator->stopOnFirstFailure()->fails()) {
+        //     return response()->json(['msg' => $validator->errors()->first()], 400);
+        // }
 
-        $evento = Evento::create($request);
+        $evento = Evento::create($request->all());
 
         //Store image if available
-        $image = $request->file('image');
-        if(isset($image)) {
-            $imgResponse = $this->storeImage($request);
+        // $image = $request->file('image');
+        // if(isset($image)) {
+        //     $imgResponse = $this->storeImage($request);
 
-            if($imgResponse[0] === 1) {
-                $evento->image_path = $imgResponse[1];
-            } else {
-                return response()->json(['msg' => $imgResponse[1]], 400);
-            }
-        }
+        //     if($imgResponse[0] === 1) {
+        //         $evento->image_path = $imgResponse[1];
+        //     } else {
+        //         return response()->json(['msg' => $imgResponse[1]], 400);
+        //     }
+        // }
 
         return response()->json(['msg' => 'Evento cadastrado com sucesso!']);
     }
